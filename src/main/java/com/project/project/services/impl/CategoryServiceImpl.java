@@ -32,4 +32,10 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(category -> modelMapper.map(category, CategoryDto.class))
                 .toList();
     }
+
+    @Override
+    public CategoryDto getCategoryById(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow();
+        return modelMapper.map(category, CategoryDto.class);
+    }
 }
