@@ -2,6 +2,9 @@ package com.project.project.services;
 
 import com.project.project.dtos.CategoryDto;
 
+import java.util.List;
+
 public interface CategoryService {
     CategoryDto createCategory(CategoryDto categoryDto);
+    List<CategoryDto> getAllCategories();
 }
