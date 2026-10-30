@@ -14,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
@@ -39,5 +41,19 @@ public class ProductServiceImpl implements ProductService {
 
         Product savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductDto.class);
+    }
+
+    @Override
+    public List<ProductDto> getAllProducts() {
+        return productRepository.findAll()
+                .stream()
+                .map(product -> modelMapper.map(product, ProductDto.class))
+                .toList();
+    }
+
+    @Override
+    public ProductDto getProductById(Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow();
+        return modelMapper.map(product, ProductDto.class);
     }
 }
