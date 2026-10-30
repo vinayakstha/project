@@ -1,5 +1,7 @@
 package com.project.project.controller;
 
+import com.project.project.dtos.LoginRequestDto;
+import com.project.project.dtos.LoginResponseDto;
 import com.project.project.dtos.SignupRequestDto;
 import com.project.project.dtos.SignupResponseDto;
 import com.project.project.services.AuthService;
@@ -18,9 +20,14 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping
+    @PostMapping("/signup")
     public ResponseEntity<SignupResponseDto> signup(@RequestBody SignupRequestDto signupRequestDto){
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signup(signupRequestDto));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto){
+        return ResponseEntity.status(HttpStatus.OK).body(authService.login(loginRequestDto));
     }
 
 }

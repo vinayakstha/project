@@ -1,12 +1,18 @@
 package com.project.project.services.impl;
 
+import com.project.project.dtos.LoginRequestDto;
+import com.project.project.dtos.LoginResponseDto;
 import com.project.project.dtos.SignupRequestDto;
 import com.project.project.dtos.SignupResponseDto;
 import com.project.project.entities.User;
 import com.project.project.enums.Role;
 import com.project.project.repositories.UserRepository;
 import com.project.project.services.AuthService;
+import com.project.project.utils.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +22,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     @Override
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
@@ -45,5 +53,19 @@ public class AuthServiceImpl implements AuthService {
                 .phoneNumber(user.getPhoneNumber())
                 .role(user.getRole())
                 .build();
+    }
+
+    @Override
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequestDto.getEmail(),
+                        loginRequestDto.getPassword()
+                )
+        );
+
+        String email = authentication.getName();
+        String token = jwtService.generateToken(email);
+        return new LoginResponseDto(token, "Bearer");
     }
 }
