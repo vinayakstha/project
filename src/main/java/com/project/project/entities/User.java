@@ -1,5 +1,6 @@
 package com.project.project.entities;
 
+import com.project.project.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,8 @@ public class User {
     @Column(unique = true)
     private String username;
 
+    private String fullName;
+
     @Column(unique = true)
     private String email;
 
@@ -27,5 +30,10 @@ public class User {
 
     @Column(unique = true)
     private String phoneNumber;
+
+    private boolean enabled = true;
+
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.CUSTOMER;
 
 }
