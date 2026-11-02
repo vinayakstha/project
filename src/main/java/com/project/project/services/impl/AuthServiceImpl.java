@@ -13,6 +13,7 @@ import com.project.project.services.AuthService;
 import com.project.project.utils.JwtService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
@@ -49,10 +51,12 @@ public class AuthServiceImpl implements AuthService {
                 .role(Role.CUSTOMER)
                 .build()
         );
+        log.info("User registration successful");
 
         Cart cart = new Cart();
         cart.setUser(user);
         cartRepository.save(cart);
+        log.info("Created cart successfully");
 
         return SignupResponseDto.builder()
                 .userId(user.getUserId())
@@ -75,6 +79,7 @@ public class AuthServiceImpl implements AuthService {
 
         String email = authentication.getName();
         String token = jwtService.generateToken(email);
+        log.info("Login successful");
         return new LoginResponseDto(token, "Bearer");
     }
 }

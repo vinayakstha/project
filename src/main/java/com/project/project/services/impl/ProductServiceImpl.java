@@ -41,7 +41,11 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(category);
         product.setUser(user);
 
+        log.debug("Saving product to database");
+
         Product savedProduct = productRepository.save(product);
+        log.info("Product created successfully. ProductID: {}", savedProduct.getProductId());
+
         return modelMapper.map(savedProduct, ProductDto.class);
     }
 
@@ -51,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<Product> products = productRepository.findAll();
 
-        log.info("successfully retrieved all products");
+        log.info("successfully retrieved all products. Total number of Products: {}", products.size());
 
         return products
                 .stream()
@@ -85,10 +89,18 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto updateProduct(Long productId, ProductDto productDto) {
 
         Product existingProduct = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(
+                        () -> {
+                            log.warn("Product not found");
+                            return new RuntimeException("Product not found");
+                        });
 
         Category category = categoryRepository.findById(productDto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(
+                        () -> {
+                            log.warn("Category not found");
+                            return new RuntimeException("Category not found");
+                        });
 
         existingProduct.setProductName(productDto.getProductName());
         existingProduct.setProductDescription(productDto.getProductDescription());
@@ -97,6 +109,7 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setCategory(category);
 
         Product updatedProduct = productRepository.save(existingProduct);
+        log.info("Product updated");
 
         ProductDto response = modelMapper.map(updatedProduct, ProductDto.class);
         response.setProductId(updatedProduct.getProductId());

@@ -34,8 +34,14 @@ public class CartServiceImpl implements CartService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
-        User user = userRepository.findByEmail(email).orElseThrow();
-        Cart cart = cartRepository.findByUser(user).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            log.warn("User not found with email: {}", email);
+            return new RuntimeException("User not found");
+        });
+        Cart cart = cartRepository.findByUser(user).orElseThrow(() -> {
+            log.warn("Cart not found");
+            return new RuntimeException("Cart not found");
+        });
 
         return modelMapper.map(cart, CartDto.class);
     }
@@ -45,22 +51,39 @@ public class CartServiceImpl implements CartService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
-        User user = userRepository.findByEmail(email).orElseThrow();
-        Cart cart = cartRepository.findByUser(user).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            log.warn("User not found with email: {}", email);
+            return new RuntimeException("User not found");
+        });
+        Cart cart = cartRepository.findByUser(user).orElseThrow(() -> {
+            log.warn("Cart not found");
+            return new RuntimeException("Cart not found");
+        });
 
         cart.getCartItems().clear();
         cartRepository.save(cart);
+        log.info("Cart cleared successfully");
     }
 
     @Override
+    @Transactional
     public CartDto addToCart(Long productId, Integer quantity) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
-        User user = userRepository.findByEmail(email).orElseThrow();
-        Cart cart = cartRepository.findByUser(user).orElseThrow();
-        Product product = productRepository.findById(productId).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(()->{
+            log.warn("User not found with email: {}", email);
+            return new RuntimeException("User not found");
+        });
+        Cart cart = cartRepository.findByUser(user).orElseThrow(()->{
+            log.warn("Cart not found");
+            return new RuntimeException("Cart not found");
+        });
+        Product product = productRepository.findById(productId).orElseThrow(()->{
+            log.warn("Product with ID: {} not found", productId);
+            return new RuntimeException("Product not found");
+        });
 
         if(quantity == null || quantity <= 0){
             throw new RuntimeException("Quantity should be greater than zero");
@@ -85,12 +108,17 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public CartDto updateQuantity(Long cartItemId, Integer quantity) {
         if(quantity == null || quantity <= 0){
             throw new RuntimeException("Quantity should be greater than zero");
         }
-        CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow();
+        CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow(()->{
+            log.warn("Cart item with ID: {} not found", cartItemId);
+            return new RuntimeException("Cart item not found");
+        });
         cartItem.setQuantity(quantity);
+        log.info("Cart updated successfully");
         return getCart();
     }
 
