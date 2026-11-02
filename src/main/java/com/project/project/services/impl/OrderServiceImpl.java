@@ -125,7 +125,43 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getAllOrders() {
-        return List.of();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email).orElseThrow(()->{
+            log.warn("User now found with email: {}", email);
+            return new RuntimeException("User not found");
+        });
+
+        List<Order> orders = orderRepository.findByUser(user);
+
+        return orders.stream()
+                .map(order -> {
+
+                    List<OrderItemDto> orderItemDtos = order.getOrderItems()
+                            .stream()
+                            .map(item -> OrderItemDto.builder()
+                                    .orderItemId(item.getOrderItemId())
+                                    .productId(item.getProduct().getProductId())
+                                    .productName(item.getProduct().getProductName())
+                                    .productImage(item.getProduct().getProductImage())
+                                    .price(item.getPrice())
+                                    .quantity(item.getQuantity())
+                                    .subtotal(item.getPrice().multiply(
+                                            BigDecimal.valueOf(item.getQuantity())
+                                    ))
+                                    .build())
+                            .toList();
+
+                    return OrderDto.builder()
+                            .orderId(order.getOrderId())
+                            .price(order.getTotalPrice())
+                            .orderStatus(order.getOrderStatus())
+                            .orderItems(orderItemDtos)
+                            .build();
+                })
+                .toList();
     }
 
     @Override
