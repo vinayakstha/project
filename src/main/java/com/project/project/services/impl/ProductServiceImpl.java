@@ -9,6 +9,7 @@ import com.project.project.repositories.ProductRepository;
 import com.project.project.repositories.UserRepository;
 import com.project.project.services.ProductService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
@@ -45,7 +47,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDto> getAllProducts() {
-        return productRepository.findAll()
+        log.info("getting all products");
+
+        List<Product> products = productRepository.findAll();
+
+        log.info("successfully retrieved all products");
+
+        return products
                 .stream()
                 .map(product -> modelMapper.map(product, ProductDto.class))
                 .toList();
@@ -53,13 +61,23 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto getProductById(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow();
+        log.info("getting product by id");
+        Product product = productRepository.findById(productId).orElseThrow(()-> {
+            log.warn("product not found");
+            return new RuntimeException("product not found");
+        });
+        log.debug("Product retrieved successfully from the database");
+
         return modelMapper.map(product, ProductDto.class);
     }
 
     @Override
     public void deleteProduct(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow();
+        Product product = productRepository.findById(productId).orElseThrow(()->{
+            log.warn("product now found");
+            return new RuntimeException("product not found");
+        });
+        log.info("deleting product from the database");
         productRepository.delete(product);
     }
 
