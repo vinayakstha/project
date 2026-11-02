@@ -166,7 +166,47 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto getOrderById(Long orderId) {
-        return null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email).orElseThrow(()->{
+            log.warn("User not found with email: {}", email);
+            return new RuntimeException("User not found");
+        });
+
+        Order order = orderRepository.findById(orderId).orElseThrow(()->{
+            log.warn("Order not found with ID: {}", orderId);
+            return new RuntimeException("Order not found");
+        });
+
+        if (!order.getUser().getUserId().equals(user.getUserId())) {
+            log.warn("User {} attempted to access another user's order", email);
+            throw new RuntimeException("You are not authorized to access this order");
+        }
+
+        // Convert order items into DTOs
+        List<OrderItemDto> orderItemDtos = order.getOrderItems()
+                .stream()
+                .map(item -> OrderItemDto.builder()
+                        .orderItemId(item.getOrderItemId())
+                        .productId(item.getProduct().getProductId())
+                        .productName(item.getProduct().getProductName())
+                        .productImage(item.getProduct().getProductImage())
+                        .price(item.getPrice())
+                        .quantity(item.getQuantity())
+                        .subtotal(item.getPrice().multiply(
+                                BigDecimal.valueOf(item.getQuantity())
+                        ))
+                        .build())
+                .toList();
+
+        // Return order DTO
+        return OrderDto.builder()
+                .orderId(order.getOrderId())
+                .price(order.getTotalPrice())
+                .orderStatus(order.getOrderStatus())
+                .orderItems(orderItemDtos)
+                .build();
     }
 
     @Override
