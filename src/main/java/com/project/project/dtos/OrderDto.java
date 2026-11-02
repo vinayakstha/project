@@ -1,6 +1,5 @@
 package com.project.project.dtos;
 
-import com.project.project.entities.OrderItem;
 import com.project.project.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,5 +17,5 @@ public class OrderDto {
     private Long orderId;
     private BigDecimal price;
     private OrderStatus orderStatus;
-    private List<OrderItem> orderItems;
+    private List<OrderItemDto> orderItems;
 }
