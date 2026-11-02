@@ -4,11 +4,14 @@ import com.project.project.dtos.LoginRequestDto;
 import com.project.project.dtos.LoginResponseDto;
 import com.project.project.dtos.SignupRequestDto;
 import com.project.project.dtos.SignupResponseDto;
+import com.project.project.entities.Cart;
 import com.project.project.entities.User;
 import com.project.project.enums.Role;
+import com.project.project.repositories.CartRepository;
 import com.project.project.repositories.UserRepository;
 import com.project.project.services.AuthService;
 import com.project.project.utils.JwtService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,10 +24,12 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final CartRepository cartRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
+    @Transactional
     @Override
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
         if(userRepository.existsByEmail(signupRequestDto.getEmail())){
@@ -44,6 +49,10 @@ public class AuthServiceImpl implements AuthService {
                 .role(Role.CUSTOMER)
                 .build()
         );
+
+        Cart cart = new Cart();
+        cart.setUser(user);
+        cartRepository.save(cart);
 
         return SignupResponseDto.builder()
                 .userId(user.getUserId())

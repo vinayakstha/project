@@ -5,12 +5,9 @@ import com.project.project.services.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/cart")
 public class CartController {
@@ -25,6 +22,11 @@ public class CartController {
     @DeleteMapping("/clear")
     public void clearCart(){
         cartService.clearCart();
+    }
+
+    @PostMapping("/{productId}/{quantity}")
+    public ResponseEntity<CartDto> addToCart(@PathVariable Long productId,@PathVariable Integer quantity){
+        return ResponseEntity.status(HttpStatus.OK).body(cartService.addToCart(productId, quantity));
     }
 
 }
