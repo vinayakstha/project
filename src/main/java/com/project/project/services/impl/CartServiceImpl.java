@@ -5,6 +5,7 @@ import com.project.project.entities.Cart;
 import com.project.project.entities.CartItem;
 import com.project.project.entities.Product;
 import com.project.project.entities.User;
+import com.project.project.repositories.CartItemRepository;
 import com.project.project.repositories.CartRepository;
 import com.project.project.repositories.ProductRepository;
 import com.project.project.repositories.UserRepository;
@@ -23,6 +24,7 @@ public class CartServiceImpl implements CartService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
+    private final CartItemRepository cartItemRepository;
 
     @Override
     public CartDto getCart() {
@@ -81,7 +83,12 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartDto updateQuantity(Long cartItemId, Integer quantity) {
-        return null;
+        if(quantity == null || quantity <= 0){
+            throw new RuntimeException("Quantity should be greater than zero");
+        }
+        CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow();
+        cartItem.setQuantity(quantity);
+        return getCart();
     }
 
     @Override

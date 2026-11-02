@@ -29,4 +29,9 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(cartService.addToCart(productId, quantity));
     }
 
+    @PutMapping("/{cartItemId}/{quantity}")
+    public ResponseEntity<CartDto> updateQuantity(@PathVariable Long cartItemId, @PathVariable Integer quantity){
+        return ResponseEntity.status(HttpStatus.OK).body(cartService.updateQuantity(cartItemId, quantity));
+    }
+
 }
