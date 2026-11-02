@@ -34,4 +34,9 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(cartService.updateQuantity(cartItemId, quantity));
     }
 
+    @DeleteMapping("/{cartItemId}")
+    public ResponseEntity<CartDto> removeFromCart(@PathVariable Long cartItemId){
+        return ResponseEntity.status(HttpStatus.OK).body(cartService.removeFromCart(cartItemId));
+    }
+
 }
