@@ -33,7 +33,14 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void clearCart() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
 
+        User user = userRepository.findByEmail(email).orElseThrow();
+        Cart cart = cartRepository.findByUser(user).orElseThrow();
+
+        cart.getCartItems().clear();
+        cartRepository.save(cart);
     }
 
     @Override
