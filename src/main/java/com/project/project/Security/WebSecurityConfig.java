@@ -22,8 +22,15 @@ public class WebSecurityConfig {
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+
+                        //category endpoints
                         .requestMatchers(HttpMethod.GET, "/category/**").permitAll()
                         .requestMatchers("/category/**").hasRole("ADMIN")
+
+                        //order endpoints
+                        .requestMatchers(HttpMethod.GET, "/order").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/order/*/status").hasRole("ADMIN")
+
                         .anyRequest().authenticated())
                 .addFilterBefore(
                 jwtAuthenticationFilter,
