@@ -1,6 +1,7 @@
 package com.project.project.controller;
 
 import com.project.project.dtos.OrderDto;
+import com.project.project.dtos.UpdateOrderStatusDto;
 import com.project.project.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,16 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<OrderDto> getOrderById(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrderById(id));
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<OrderDto> updateOrderStatus(@PathVariable Long id, @RequestBody UpdateOrderStatusDto updateOrderStatusDto){
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.updateOrderStatus(id, updateOrderStatusDto));
+    }
+
+    @DeleteMapping("/{id}")
+    public void cancelOrder(@PathVariable Long orderId){
+        orderService.cancelOrder(orderId);
     }
 
 }

@@ -2,6 +2,7 @@ package com.project.project.services.impl;
 
 import com.project.project.dtos.OrderDto;
 import com.project.project.dtos.OrderItemDto;
+import com.project.project.dtos.UpdateOrderStatusDto;
 import com.project.project.entities.*;
 import com.project.project.enums.OrderStatus;
 import com.project.project.repositories.CartRepository;
@@ -210,12 +211,67 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto updateOrderStatus(Long orderId, OrderStatus orderStatus) {
-        return null;
+    public OrderDto updateOrderStatus(Long orderId, UpdateOrderStatusDto updateOrderStatusDto) {
+
+        Order order = orderRepository.findById(orderId).orElseThrow(()->{
+            log.warn("Order not found with ID: {}", orderId);
+            return new RuntimeException("Order not found");
+        });
+
+        order.setOrderStatus(updateOrderStatusDto.getOrderStatus());
+
+        Order updatedOrder = orderRepository.save(order);
+
+        List<OrderItemDto> orderItemDtos = updatedOrder.getOrderItems().stream()
+                .map(item -> OrderItemDto.builder()
+                        .orderItemId(item.getOrderItemId())
+                        .productId(item.getProduct().getProductId())
+                        .productName(item.getProduct().getProductName())
+                        .productImage(item.getProduct().getProductImage())
+                        .price(item.getPrice())
+                        .quantity(item.getQuantity())
+                        .subtotal(item.getPrice().multiply(
+                                BigDecimal.valueOf(item.getQuantity())))
+                        .build())
+                .toList();
+
+        return OrderDto.builder()
+                .orderId(updatedOrder.getOrderId())
+                .price(updatedOrder.getTotalPrice())
+                .orderStatus(updatedOrder.getOrderStatus())
+                .orderItems(orderItemDtos)
+                .build();
     }
 
     @Override
     public void cancelOrder(Long orderId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            log.warn("User not found with email: {}", email);
+            return new RuntimeException("User not found");
+        });
+
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> {
+            log.warn("Order not found with ID: {}", orderId);
+            return new RuntimeException("Order not found");
+        });
+
+        if (!order.getUser().getUserId().equals(user.getUserId())) {
+            log.warn("User {} attempted to cancel another user's order", email);
+            throw new RuntimeException("You are not authorized to cancel this order");
+        }
+
+        if (order.getOrderStatus() == OrderStatus.SHIPPED ||
+                order.getOrderStatus() == OrderStatus.DELIVERED ||
+                order.getOrderStatus() == OrderStatus.CANCELLED) {
+            throw new RuntimeException("This order cannot be cancelled");
+        }
+
+        order.setOrderStatus(OrderStatus.CANCELLED);
+
+        orderRepository.save(order);
 
     }
 }
