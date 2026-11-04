@@ -3,6 +3,7 @@ package com.project.project.controller;
 import com.project.project.dtos.OrderDto;
 import com.project.project.dtos.UpdateOrderStatusDto;
 import com.project.project.services.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<OrderDto> updateOrderStatus(@PathVariable Long id, @RequestBody UpdateOrderStatusDto updateOrderStatusDto){
+    public ResponseEntity<OrderDto> updateOrderStatus(@PathVariable Long id, @Valid @RequestBody UpdateOrderStatusDto updateOrderStatusDto){
         return ResponseEntity.status(HttpStatus.OK).body(orderService.updateOrderStatus(id, updateOrderStatusDto));
     }
 

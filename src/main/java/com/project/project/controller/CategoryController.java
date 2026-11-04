@@ -2,6 +2,7 @@ package com.project.project.controller;
 
 import com.project.project.dtos.CategoryDto;
 import com.project.project.services.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDto){
+    public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto categoryDto){
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(categoryDto));
     }
 
@@ -37,7 +38,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDto> updateCategory(@RequestBody CategoryDto categoryDto, @PathVariable Long id){
+    public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody CategoryDto categoryDto, @PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(categoryService.updateCategory(categoryDto, id));
     }
 }

@@ -1,6 +1,7 @@
 package com.project.project.dtos;
 
 import com.project.project.enums.OrderStatus;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,10 @@ import java.util.List;
 @Builder
 public class OrderDto {
     private Long orderId;
+
+    @NotBlank(message = "Price is mandatory")
     private BigDecimal price;
+
     private OrderStatus orderStatus;
     private List<OrderItemDto> orderItems;
 }

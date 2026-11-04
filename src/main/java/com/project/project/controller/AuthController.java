@@ -5,6 +5,7 @@ import com.project.project.dtos.LoginResponseDto;
 import com.project.project.dtos.SignupRequestDto;
 import com.project.project.dtos.SignupResponseDto;
 import com.project.project.services.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +22,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponseDto> signup(@RequestBody SignupRequestDto signupRequestDto){
+    public ResponseEntity<SignupResponseDto> signup(@Valid @RequestBody SignupRequestDto signupRequestDto){
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signup(signupRequestDto));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto){
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequestDto){
         return ResponseEntity.status(HttpStatus.OK).body(authService.login(loginRequestDto));
     }
 
