@@ -122,6 +122,9 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto> getProductsByCategory(Long categoryId) {
         log.info("Getting product by categoryId: {}", categoryId);
         List<Product> products = productRepository.findByCategory_CategoryId(categoryId);
+        if(products.isEmpty()){
+            log.warn("Could not find category with ID: {}", categoryId);
+        }
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductDto.class))
                 .toList();
@@ -131,6 +134,9 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto> searchProductsByName(String keyword) {
         log.info("Searching products by productName: {}", keyword);
         List<Product> products = productRepository.findByProductNameContainingIgnoreCase(keyword);
+        if(products.isEmpty()){
+            log.warn("Could not find product with name: {}", keyword);
+        }
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductDto.class))
                 .toList();
