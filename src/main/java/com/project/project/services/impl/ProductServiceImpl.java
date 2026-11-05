@@ -125,4 +125,12 @@ public class ProductServiceImpl implements ProductService {
                 .map(product -> modelMapper.map(product, ProductDto.class))
                 .toList();
     }
+
+    @Override
+    public List<ProductDto> searchProductsByName(String keyword) {
+        List<Product> products = productRepository.findByProductNameContainingIgnoreCase(keyword);
+        return products.stream()
+                .map(product -> modelMapper.map(product, ProductDto.class))
+                .toList();
+    }
 }

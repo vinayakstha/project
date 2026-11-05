@@ -23,9 +23,15 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductDto>> getAllProducts(@RequestParam(required = false) Long categoryId){
+    public ResponseEntity<List<ProductDto>> getAllProducts(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String keyword
+    ){
         if(categoryId != null){
             return ResponseEntity.status(HttpStatus.OK).body(productService.getProductsByCategory(categoryId));
+        }
+        if(keyword !=null){
+            return ResponseEntity.status(HttpStatus.OK).body(productService.searchProductsByName(keyword));
         }
         return ResponseEntity.status(HttpStatus.OK).body(productService.getAllProducts());
     }
