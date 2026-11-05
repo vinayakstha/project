@@ -23,7 +23,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductDto>> getAllProducts(){
+    public ResponseEntity<List<ProductDto>> getAllProducts(@RequestParam(required = false) Long categoryId){
+        if(categoryId != null){
+            return ResponseEntity.status(HttpStatus.OK).body(productService.getProductsByCategory(categoryId));
+        }
         return ResponseEntity.status(HttpStatus.OK).body(productService.getAllProducts());
     }
 
@@ -36,4 +39,5 @@ public class ProductController {
     public ResponseEntity<ProductDto> updateProduct(@Valid @RequestBody ProductDto productDto, @PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(productService.updateProduct(id, productDto));
     }
+
 }
