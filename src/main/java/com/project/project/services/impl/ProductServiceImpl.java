@@ -117,4 +117,12 @@ public class ProductServiceImpl implements ProductService {
 
         return response;
     }
+
+    @Override
+    public List<ProductDto> getProductsByCategory(Long categoryId) {
+        List<Product> products = productRepository.findByCategory_CategoryId(categoryId);
+        return products.stream()
+                .map(product -> modelMapper.map(product, ProductDto.class))
+                .toList();
+    }
 }
