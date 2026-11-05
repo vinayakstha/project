@@ -16,28 +16,39 @@ public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-        httpSecurity
-                .csrf(csrfConfig -> csrfConfig.disable())
-                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
+//        httpSecurity
+//                .csrf(csrfConfig -> csrfConfig.disable())
+//                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/auth/**").permitAll()
+//                        .requestMatchers("/", "/home", "/css/**", "/js/**", "/images/**").permitAll()
+//
+//                        //category endpoints
+//                        .requestMatchers(HttpMethod.GET, "/category/**").permitAll()
+//                        .requestMatchers("/category/**").hasRole("ADMIN")
+//
+//                        //order endpoints
+//                        .requestMatchers(HttpMethod.GET, "/order").hasRole("ADMIN")
+//                        .requestMatchers(HttpMethod.PUT, "/order/*/status").hasRole("ADMIN")
+//
+//                        .anyRequest().authenticated())
+//                .addFilterBefore(
+//                jwtAuthenticationFilter,
+//                UsernamePasswordAuthenticationFilter.class
+//        );
+//
+//        return httpSecurity.build();
+//    }
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .anyRequest().permitAll()
+                );
 
-                        //category endpoints
-                        .requestMatchers(HttpMethod.GET, "/category/**").permitAll()
-                        .requestMatchers("/category/**").hasRole("ADMIN")
-
-                        //order endpoints
-                        .requestMatchers(HttpMethod.GET, "/order").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/order/*/status").hasRole("ADMIN")
-
-                        .anyRequest().authenticated())
-                .addFilterBefore(
-                jwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class
-        );
-
-        return httpSecurity.build();
+        return http.build();
     }
 
 }
