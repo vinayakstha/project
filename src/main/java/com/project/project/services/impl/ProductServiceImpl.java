@@ -120,6 +120,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDto> getProductsByCategory(Long categoryId) {
+        log.info("Getting product by categoryId: {}", categoryId);
         List<Product> products = productRepository.findByCategory_CategoryId(categoryId);
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductDto.class))
@@ -128,6 +129,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDto> searchProductsByName(String keyword) {
+        log.info("Searching products by productName: {}", keyword);
         List<Product> products = productRepository.findByProductNameContainingIgnoreCase(keyword);
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductDto.class))
