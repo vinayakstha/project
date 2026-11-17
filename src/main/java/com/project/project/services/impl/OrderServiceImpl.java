@@ -274,4 +274,22 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
 
     }
+
+    @Override
+    public List<OrderDto> getAllOrdersForAdmin() {
+
+        List<Order> orders = orderRepository.findAll();
+
+        System.out.println("Total orders in database: " + orders.size());
+
+        return orders.stream()
+                .map(order -> OrderDto.builder()
+                        .orderId(order.getOrderId())
+                        .price(order.getTotalPrice())
+                        .orderStatus(order.getOrderStatus())
+                        .customerName(order.getUser().getFullName())
+                        .customerEmail(order.getUser().getEmail())
+                        .build())
+                .toList();
+    }
 }

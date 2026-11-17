@@ -16,10 +16,11 @@ import java.util.List;
 @Builder
 public class OrderDto {
     private Long orderId;
-
-    @NotBlank(message = "Price is mandatory")
     private BigDecimal price;
-
     private OrderStatus orderStatus;
+
+    private String customerName;
+    private String customerEmail;
+
     private List<OrderItemDto> orderItems;
 }

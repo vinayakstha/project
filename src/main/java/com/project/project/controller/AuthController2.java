@@ -66,6 +66,13 @@ public class AuthController2 {
 
         securityContextRepository.saveContext(context, request, response);
 
+        if (authentication.getAuthorities().stream()
+                .anyMatch(authority ->
+                        authority.getAuthority().equals("ROLE_ADMIN"))) {
+
+            return "redirect:/admin/dashboard";
+        }
+
         return "redirect:/home";
     }
 }
