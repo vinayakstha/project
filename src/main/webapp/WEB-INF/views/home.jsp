@@ -15,7 +15,16 @@
 
 <div class="container mt-5">
 
-    <h1 class="mb-4">Products</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h1 class="mb-0">Products</h1>
+
+        <a href="${pageContext.request.contextPath}/cart"
+           class="btn btn-primary">
+            My Cart
+        </a>
+
+    </div>
 
     <div class="row g-4">
 

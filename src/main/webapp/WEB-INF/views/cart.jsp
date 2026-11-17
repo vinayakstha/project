@@ -85,11 +85,10 @@
                         </h5>
                     </div>
 
-                    <button class="btn btn-primary w-100"
-                            type="button"
-                            onclick="checkout()">
+                    <a href="${pageContext.request.contextPath}/checkout"
+                        class="btn btn-primary w-100">
                         Proceed to Checkout
-                    </button>
+                    </a>
 
                     <button class="btn btn-outline-danger w-100 mt-2"
                             type="button"

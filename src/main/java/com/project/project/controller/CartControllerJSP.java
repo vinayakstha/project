@@ -30,4 +30,10 @@ public class CartControllerJSP {
 
         return "redirect:/cart";
     }
+
+    @GetMapping("/checkout")
+    public String checkout(Model model){
+        model.addAttribute("cart", cartService.getCart());
+        return "checkout";
+    }
 }
