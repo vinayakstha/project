@@ -1,5 +1,6 @@
 package com.project.project.Security;
 
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,39 +17,55 @@ public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-//        httpSecurity
-//                .csrf(csrfConfig -> csrfConfig.disable())
-//                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/auth/**").permitAll()
-//                        .requestMatchers("/", "/home", "/css/**", "/js/**", "/images/**").permitAll()
-//
-//                        //category endpoints
-//                        .requestMatchers(HttpMethod.GET, "/category/**").permitAll()
-//                        .requestMatchers("/category/**").hasRole("ADMIN")
-//
-//                        //order endpoints
-//                        .requestMatchers(HttpMethod.GET, "/order").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.PUT, "/order/*/status").hasRole("ADMIN")
-//
-//                        .anyRequest().authenticated())
-//                .addFilterBefore(
-//                jwtAuthenticationFilter,
-//                UsernamePasswordAuthenticationFilter.class
-//        );
-//
-//        return httpSecurity.build();
-//    }
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
+
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                )
+
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+
+                        // Allow JSP forwards and error dispatches
+                        .dispatcherTypeMatchers(
+                                DispatcherType.FORWARD,
+                                DispatcherType.ERROR
+                        ).permitAll()
+
+                        // Public pages
+                        .requestMatchers(
+                                "/", "/signup", "/login",
+                                "/css/**", "/js/**", "/images/**"
+                        ).permitAll()
+
+                        // Authentication APIs
+                        .requestMatchers("/auth/**").permitAll()
+
+                        // Authenticated pages
+                        .requestMatchers("/home", "/cart").authenticated()
+
+                        // Cart APIs
+                        .requestMatchers("/cart-api/**").authenticated()
+
+                        // Category endpoints
+                        .requestMatchers(HttpMethod.GET, "/category/**").permitAll()
+                        .requestMatchers("/category/**").hasRole("ADMIN")
+
+                        // Order endpoints
+                        .requestMatchers(HttpMethod.GET, "/order").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/order/*/status").hasRole("ADMIN")
+
+                        // Everything else
+                        .anyRequest().authenticated()
+                )
+
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
                 );
 
         return http.build();
     }
-
 }

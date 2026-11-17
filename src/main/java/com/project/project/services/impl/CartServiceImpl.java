@@ -1,6 +1,7 @@
 package com.project.project.services.impl;
 
 import com.project.project.dtos.CartDto;
+import com.project.project.dtos.CartItemDto;
 import com.project.project.entities.Cart;
 import com.project.project.entities.CartItem;
 import com.project.project.entities.Product;
@@ -18,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -29,24 +32,72 @@ public class CartServiceImpl implements CartService {
     private final ModelMapper modelMapper;
     private final CartItemRepository cartItemRepository;
 
+//    @Override
+//    public CartDto getCart() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String email = authentication.getName();
+//
+//        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+//            log.warn("User not found with email: {}", email);
+//            return new RuntimeException("User not found");
+//        });
+//        Cart cart = cartRepository.findByUser(user).orElseThrow(() -> {
+//            log.warn("Cart not found");
+//            return new RuntimeException("Cart not found");
+//        });
+//
+//        return modelMapper.map(cart, CartDto.class);
+//    }
+@Override
+@Transactional
+public CartDto getCart() {
+
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
+
+    String email = authentication.getName();
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    Cart cart = cartRepository.findByUser(user)
+            .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+    List<CartItemDto> cartItems = cart.getCartItems()
+            .stream()
+            .map(item -> CartItemDto.builder()
+                    .cartItemId(item.getCartItemId())
+                    .productId(item.getProduct().getProductId())
+                    .productName(item.getProduct().getProductName())
+                    .productPrice(item.getProduct().getProductPrice())
+                    .productImage(item.getProduct().getProductImage())
+                    .quantity(item.getQuantity())
+                    .subTotal(item.getProduct().getProductPrice()
+                            * item.getQuantity())
+                    .build())
+            .toList();
+
+    int totalItems = cart.getCartItems()
+            .stream()
+            .mapToInt(CartItem::getQuantity)
+            .sum();
+
+    long totalPrice = cart.getCartItems()
+            .stream()
+            .mapToLong(item ->
+                    item.getProduct().getProductPrice() * item.getQuantity())
+            .sum();
+
+    return CartDto.builder()
+            .cartId(cart.getCartId())
+            .cartItem(cartItems)
+            .totalItems(totalItems)
+            .totalPrice(totalPrice)
+            .build();
+}
+
     @Override
-    public CartDto getCart() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-
-        User user = userRepository.findByEmail(email).orElseThrow(() -> {
-            log.warn("User not found with email: {}", email);
-            return new RuntimeException("User not found");
-        });
-        Cart cart = cartRepository.findByUser(user).orElseThrow(() -> {
-            log.warn("Cart not found");
-            return new RuntimeException("Cart not found");
-        });
-
-        return modelMapper.map(cart, CartDto.class);
-    }
-
-    @Override
+    @Transactional
     public void clearCart() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
